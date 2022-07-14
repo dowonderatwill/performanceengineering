@@ -103,7 +103,7 @@ public class WriteDataQ {
 		log.info("calling get, this will wait for all consumers to finish.");
 		for (int i = 0; i < wc; i++) try {	fl.get(i).get();  } catch (Exception e) { e.printStackTrace();}
 		Instant et = Instant.now();
-		log.info("Consumers collectively finished all work. Total Work Time in main thread(ms)=[{}]ms, load=[{}] ", Duration.between(st, et).toMillis(),loadCounter.get());
+		log.info("Consumers collectively finished all work. Total Work Time in main thread(ms)=[{}]ms ", Duration.between(st, et).toMillis());
 		
 	}
 	
@@ -119,7 +119,7 @@ public class WriteDataQ {
 			r++;
 			try {
 				String s = q.take();
-//				doCpuIntensiveTask(s);
+				doCpuIntensiveTask(s);
 			} catch (InterruptedException e) {	e.printStackTrace();	}
 		}
 		Instant et = Instant.now();
