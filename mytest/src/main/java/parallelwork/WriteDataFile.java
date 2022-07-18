@@ -179,7 +179,7 @@ public class WriteDataFile {
 		if(null!=bos) try { bos.close(); }	catch(Exception e) { log.error("close buff. {}",e.getMessage()); }
 		
 		Instant et = Instant.now();
-		log.info("The consumer completed in [{}]ms, load=[{}], looped count=[{}] ( to get chunk from map )", Duration.between(st, et).toMillis(),r,c);
+		log.info("The consumer completed in *** [ {} ]ms ***, load=[{}], looped count=[{}] ( to get chunk from map )", Duration.between(st, et).toMillis(),r,c);
 		return r;
 	}
 	

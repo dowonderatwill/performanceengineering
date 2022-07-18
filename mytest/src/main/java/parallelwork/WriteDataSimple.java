@@ -54,7 +54,7 @@ public class WriteDataSimple {
 	
 	public void test() {
 		
-		log.info("--- Consumers are starting work. ---");
+		log.info("Consumers are starting work.");
 		Instant st = Instant.now();
 		final int load = max_load; 
 		for(int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->doTask(),es));
@@ -63,7 +63,7 @@ public class WriteDataSimple {
 //		for (int i = 0; i < wc; i++) try {	log.info("consumer [{}] \t completed in [{}]ms", i, fl.get(i).get());  } catch (Exception e) { e.printStackTrace();}
 		for (int i = 0; i < wc; i++) try {	fl.get(i).get();  } catch (Exception e) { e.printStackTrace();}
 		Instant et = Instant.now();
-		log.info("*** Consumers collectively finished all work. Total Work Time in main thread(ms)=[{}]ms ***", Duration.between(st, et).toMillis());
+		log.info("Consumers collectively finished all work. Total Work Time in main thread(ms)= *** [ {} ]ms ***", Duration.between(st, et).toMillis());
 		
 	}
 	
