@@ -36,13 +36,13 @@ public class WriteDataSimple {
 	
 	public static final Logger log = LogManager.getLogger(WriteDataSimple.class);
 	
-	int wc = 0; // workers count.
+	protected int wc = 0; // workers count.
 	
-	static int max_load = 10;
+	protected static int max_load = 10;
 	
 	public ExecutorService es = null;
 	
-	final static ArrayList<CompletableFuture<Integer>> fl =  new ArrayList<CompletableFuture<Integer>>();
+	protected final static ArrayList<CompletableFuture<Integer>> fl =  new ArrayList<CompletableFuture<Integer>>();
 	
 	public void init(String[] args) {
 		max_load = Integer.parseInt(args[0]);
@@ -57,7 +57,7 @@ public class WriteDataSimple {
 		log.info("--- Consumers are starting work. ---");
 		Instant st = Instant.now();
 		final int load = max_load; 
-		for(int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->doTask(load, true),es));
+		for(int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->doTask(),es));
 		
 		log.info("calling get, this will wait for all consumers to finish.");
 //		for (int i = 0; i < wc; i++) try {	log.info("consumer [{}] \t completed in [{}]ms", i, fl.get(i).get());  } catch (Exception e) { e.printStackTrace();}
@@ -68,7 +68,7 @@ public class WriteDataSimple {
 	}
 	
 	public void doWarmUpTask() {
-		for(int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->doTask(1,false),es));
+		for (int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->{int k =0; for(;k<100;k++) {} return k;},es));
 		for (int i = 0; i < wc; i++) try {	fl.get(i).get();  } catch (Exception e) { e.printStackTrace();}
 		for (int i = wc - 1; i >=0; i--) try {	fl.remove(i);  } catch (Exception e) { e.printStackTrace();} // clean the list.
 		log.info("warmup done. Now thread pool leaded with desired cosumers threads.");
@@ -79,54 +79,45 @@ public class WriteDataSimple {
 		es.shutdown();
 	}
 	
-	private int doTask(int load, boolean printLog) {
+	protected int doTask() {
 		Instant st = Instant.now();
 		int r = 0;
 		
 		String s = "someSampleStrings";
-		ArrayList<String> list = new ArrayList<String>(s.length());
-		Random rad = new Random(29);
-		while( r++  < load ) {
-			doCpuIntensiveTask(s,rad,list);
+		while( r++  < max_load ) {
+			doCpuIntensiveTask(s);
 		}
 		Instant et = Instant.now();
 		
 		long retTime = Duration.between(st, et).toMillis();
-		if(true == printLog)	log.info("The consumer completed in [{}]ms, load=[{}]", retTime,--r);
+		log.info("The consumer completed in [{}]ms, load=[{}]", retTime,--r);
 		return (int)retTime;
 	}
 	
 	// hypothetical cpu intensive task.
-	private void doCpuIntensiveTask(String s, Random r, ArrayList<String> list ) {
-		byte[] ba = s.getBytes();
-		list = new ArrayList<String>(ba.length);
-		
-		for(int i=0;i<ba.length;i++) {
-			list.add(r.nextInt() + "_"+ba[0]);
-		}
-		
+	protected void doCpuIntensiveTask(String s ) {
 		int count = 1000000;
 		for(int i=0;i<count;i++) {
-			list.add(r.nextInt()+ "ckjkjkjkjkkjkjkj");
+			for(int k=0;k<10000;k++) {
+				k=k+i;
+			}
 		}
 		
-		for(int i=count;i>0;i--) {
-			list.remove(i);
-		}
+		
 	}
 	
-	private void printThreadsPoolStats() {
+	protected void printThreadsPoolStats() {
 		printThreadsPoolStats("");
 	}
 	
-	private void printThreadsPoolStats(String msg) {
+	protected void printThreadsPoolStats(String msg) {
 		ThreadPoolExecutor tp = (ThreadPoolExecutor) es;
 
 		log.info("ExecutorsStats ( ActiveThreadCount=[{}] \t TaskCount=[{}] \t QueueSize=[{}] \t PoolSize=[{}] {} )",
 				tp.getActiveCount(), tp.getTaskCount(), tp.getQueue().size(), tp.getPoolSize(),msg);
 	}
 	
-	private void waitForUserInputToExit() {
+	protected void waitForUserInputToExit() {
 		printThreadsPoolStats();
 		Scanner s = new Scanner(System.in);
 		log.info("Press any key and then enter to exit...");
@@ -134,6 +125,7 @@ public class WriteDataSimple {
 		log.info("Exiting..");
 		
 	}
+	
 	
 	public static void main(String[] args) {
 		
@@ -147,5 +139,6 @@ public class WriteDataSimple {
 		w.doCleanup();
 		
 	}
+	
 
 }

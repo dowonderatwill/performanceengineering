@@ -98,8 +98,6 @@ public class WriteDataQ {
 		Instant st = Instant.now();
 		for(int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->doTask(),es));
 		
-//		printThreadsPoolStats(" After submitting tasks");
-		
 		log.info("calling get, this will wait for all consumers to finish.");
 		for (int i = 0; i < wc; i++) try {	fl.get(i).get();  } catch (Exception e) { e.printStackTrace();}
 		Instant et = Instant.now();
@@ -114,7 +112,6 @@ public class WriteDataQ {
 	private int doTask() {
 		Instant st = Instant.now();
 		int r = 0;
-		String thd = Thread.currentThread().getName();
 		while( loadCounter.getAndIncrement()  < max_load ) {
 			r++;
 			try {
@@ -128,31 +125,34 @@ public class WriteDataQ {
 		return r;
 	}
 	
+	public void doWarmUpTask() {
+		for (int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->{int k =0; for(;k<100;k++) {} return k;},es));
+		for (int i = 0; i < wc; i++) try {	fl.get(i).get();  } catch (Exception e) { e.printStackTrace();}
+		for (int i = wc - 1; i >=0; i--) try {	fl.remove(i);  } catch (Exception e) { e.printStackTrace();} // clean the list.
+		log.info("warmup done. Now thread pool leaded with desired cosumers threads.");
+		printThreadsPoolStats();
+	}
+
 	// hypothetical cpu intensive task.
-	private void doCpuIntensiveTask(String s) {
-		Instant st =  Instant.now();
+	protected void doCpuIntensiveTask(String s) {
 		byte[] ba = s.getBytes();
 		ArrayList<String> list = new ArrayList<String>(ba.length);
 		Random r = new Random(2);
-		
-		for(int i=0;i<ba.length;i++) {
-			list.add(r.nextInt() + "_"+ba[0]);
+
+		for (int i = 0; i < ba.length; i++) {
+			list.add(r.nextInt() + "_" + ba[0]);
 		}
-		
+
 		int count = 1000000;
-		for(int i=0;i<count;i++) {
-			r = new Random(i);
-			list.add(r.nextInt()+ "ckjkjkjkjkkjkjkj");
+		for (int i = 0; i < count; i++) {
+			list.add(r.nextInt() + "ckjkjkjkjkkjkjkj");
 		}
-		
-		for(int i=count;i>0;i--) {
+
+		for (int i = count; i > 0; i--) {
 			list.remove(i);
 		}
-		
-		Instant et = Instant.now();
-//		log.info("cpu intensive execution time(ms) {}", Duration.between(st, et).toMillis());
 	}
-	
+
 	private void printThreadsPoolStats() {
 		printThreadsPoolStats("");
 	}
@@ -178,6 +178,7 @@ public class WriteDataQ {
 		
 		WriteDataQ w = new WriteDataQ();
 		w.init(args);
+		w.doWarmUpTask();
 		w.test();
 		
 		

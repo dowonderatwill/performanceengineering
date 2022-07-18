@@ -148,6 +148,14 @@ public class WriteDataMap {
 		return r;
 	}
 	
+	public void doWarmUpTask() {
+		for (int i=0;i<wc;i++) fl.add( CompletableFuture.supplyAsync(()->{int k =0; for(;k<100;k++) {} return k;},es));
+		for (int i = 0; i < wc; i++) try {	fl.get(i).get();  } catch (Exception e) { e.printStackTrace();}
+		for (int i = wc - 1; i >=0; i--) try {	fl.remove(i);  } catch (Exception e) { e.printStackTrace();} // clean the list.
+		log.info("warmup done. Now thread pool leaded with desired cosumers threads.");
+		printThreadsPoolStats();
+	}
+	
 	// hypothetical cpu intensive task.
 	private void doCpuIntensiveTask(String s) {
 		Instant st =  Instant.now();
@@ -197,6 +205,7 @@ public class WriteDataMap {
 		
 		WriteDataMap w = new WriteDataMap();
 		w.init(args);
+		w.doWarmUpTask();
 		w.test();
 		
 		
