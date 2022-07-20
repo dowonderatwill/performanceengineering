@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * How to run: create the Jar using "mvn clean install" and run like below.
- * C:\ckp\Soft\Eclipse\ws\mytest>C:\ckp\Soft\jdk-14.0.1\bin\java -cp target/mytest-0.0.1-SNAPSHOT.jar parallelwork.WriteDataFile 10 1 5
+ * java -cp target/mytest-0.0.1-SNAPSHOT.jar parallelwork.WriteDataFile 20000 1 10000 1 10000
  * 
  * args[0] : load : mandatory else exception
  * args[1] : number of workers thread :  default is 1

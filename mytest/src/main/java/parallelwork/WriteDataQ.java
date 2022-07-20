@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * How to run: create the Jar using "mvn clean install" and run like below.
- * C:\ckp\Soft\Eclipse\ws\mytest>C:\ckp\Soft\jdk-14.0.1\bin\java -cp target/mytest-0.0.1-SNAPSHOT.jar parallelwork.WriteDataQ 50 2
+ * java -cp target/mytest-0.0.1-SNAPSHOT.jar parallelwork.WriteDataQ 50 2
  * 
  * args[0] : load : mandatory else exception
  * args[1] : number of workers thread :  default is 1
@@ -93,6 +93,8 @@ public class WriteDataQ {
 	public void test() {
 		
 		produceLoad();
+		
+		waitForUserInputToExit(); //after puzzle comment out this.
 		
 		log.info("Consumers are starting work. loadSize={}",q.size());
 		Instant st = Instant.now();
@@ -167,10 +169,8 @@ public class WriteDataQ {
 	private void waitForUserInputToExit() {
 		printThreadsPoolStats();
 		Scanner s = new Scanner(System.in);
-		log.info("Press any key and then enter to exit...");
+		log.info("Press any key and then enter...");
 		String str = s.next();
-		log.info("Exiting..");
-		
 	}
 	
 	public static void main(String[] args) {
