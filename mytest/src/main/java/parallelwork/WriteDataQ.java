@@ -94,7 +94,7 @@ public class WriteDataQ {
 		
 		produceLoad();
 		
-		waitForUserInputToExit(); //after puzzle comment out this.
+//		waitForUserInputToExit(); //after puzzle comment out this.
 		
 		log.info("Consumers are starting work. loadSize={}",q.size());
 		Instant st = Instant.now();
